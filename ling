@@ -1,0 +1,140 @@
+#ifndef __LING_H__
+#define __LING_H__
+
+#include <iostream>
+#include <string>
+
+namespace std
+{
+	// Big Integer Class
+	class ling
+	{
+	private:
+		string number;	// Value of number
+		
+	public:
+		// Constructor
+		ling() : number("") {}
+		ling(string number) : number(number) {}
+		
+		// Destructor
+		~ling() {}
+		
+		// Getters
+		string get_value() { return number; }
+		
+		// Setters
+		void set_value(string number) { this->number = number; }
+		
+		// Functions
+		inline int max(int a, int b) { return a > b ? a : b; }
+		
+		// Operators
+		ling operator+(const ling& other);
+		bool operator<(const ling& other);
+		bool operator>(const ling& other);
+		
+		// Friends
+		friend ostream& operator<<(ostream& os, const ling& obj)
+		{
+			os << obj.number;
+			
+			return os;
+		}
+	};
+	
+	// n1 + n2 (Add)
+	ling ling::operator+(const ling& other)
+	{
+		ling out;	// Final result
+		string result;	// Calculation result
+		string n1 = this->number;
+		string n2 = other.number;
+		int n1_size = n1.size();
+		int n2_size = n2.size();
+		string zero = "";
+		
+		// Make the sizes of two strings the same. (e.g. 1234, 56 is 1234, 0056)
+		if (n1_size < n2_size)
+		{
+			for (int i = 0; i < n2_size - n1_size; i++) zero += '0';
+			n1 = zero + n1;
+		}
+		else if (n1_size > n2_size)
+		{
+			for (int i = 0; i < n1_size - n2_size; i++) zero += '0';
+			n2 = zero + n2;
+		}
+		
+		// Add from the last digit
+		int calculate_size = max(n1_size, n2_size);
+		int carry = 0;	// Whether to receive or not
+		
+		for (int i = 1; i <= calculate_size; i++)
+		{
+			int digit = (n1[calculate_size - i] - '0') + (n2[calculate_size - i] - '0') + carry;
+			
+			if (digit < 10) carry = 0;
+			else
+			{
+				carry = 1;
+				digit -= 10;
+			}
+			
+			result += to_string(digit);
+		}
+		
+		if (carry == 1) result += to_string(carry);
+		
+		// Connect number from each digit.
+		for (int i = result.size() - 1; i >= 0; i--) out.number += result[i];
+		
+		return out;
+	}
+	
+	// n1 < n2
+	bool ling::operator<(const ling& other)
+	{
+		string n1 = this->number;
+		string n2 = other.number;
+		int n1_size = n1.size();
+		int n2_size = n2.size();
+		
+		// Compare by digits.
+		if (n1_size < n2_size) return true;
+		else if (n1_size > n2_size) return false;
+		
+		// Compare each digit.
+		for (int i = 0; i < n1_size; i++)
+		{
+			if (n1[i] < n2[i]) return true;
+			else if (n1[i] > n2[i]) return false;
+		}
+		
+		return false;
+	}
+	
+	// n1 > n2
+	bool ling::operator>(const ling& other)
+	{
+		string n1 = this->number;
+		string n2 = other.number;
+		int n1_size = n1.size();
+		int n2_size = n2.size();
+		
+		// Compare by digits.
+		if (n1_size < n2_size) return false;
+		else if (n1_size > n2_size) return true;
+		
+		// Compare each digit.
+		for (int i = 0; i < n1_size; i++)
+		{
+			if (n1[i] > n2[i]) return true;
+			else if (n1[i] < n2[i]) return false;
+		}
+		
+		return false;
+	}
+}
+
+#endif
